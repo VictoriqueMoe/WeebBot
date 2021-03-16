@@ -18,22 +18,29 @@ export abstract class OnReady extends BaseDAO<any> {
 
     @On("ready")
     private async initialize(): Promise<void> {
-        if(Main.testMode){
-            await Main.client.user.setActivity("Under development", {type: "LISTENING"});
-            await Main.client.user.setPresence({
-                status: "invisible"
-            });
-        }else{
-            await Main.client.user.setActivity('Anime', {type: 'WATCHING'});
+        try{
+            if(Main.testMode){
+                await Main.client.user.setActivity("Under development", {type: "LISTENING"});
+                await Main.client.user.setPresence({
+                    status: "invisible"
+                });
+            }else{
+                await Main.client.user.setActivity('Anime', {type: 'WATCHING'});
+            }
+            await Main.dao.sync({force: false});
+            await VicDropbox.instance.index();
+            await OnReady.initiateMuteTimers();
+            await this.initUsernames();
+            await this.populateClosableEvents();
+            if(!Main.testMode){
+                await this.cacheChannels();
+                await loadClasses(...this.classesToLoad);
+            }
+            console.log("Bot logged in.");
+        }catch(e){
+            console.error(e);
+            process.exit(1);
         }
-        await Main.dao.sync({force: false});
-        await VicDropbox.instance.index();
-        await OnReady.initiateMuteTimers();
-        await this.initUsernames();
-        await this.populateClosableEvents();
-        await this.cacheChannels();
-        await loadClasses(...this.classesToLoad);
-        console.log("Bot logged in.");
     }
 
     private async cacheChannels(): Promise<void> {

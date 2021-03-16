@@ -4,7 +4,7 @@ import {RolePersistenceModel} from "../../../model/DB/autoMod/impl/RolePersisten
 import {IScheduledJob} from "../../../model/scheduler/IScheduledJob";
 import {Guild, GuildMember} from "discord.js";
 import {Main} from "../../../Main";
-import {Scheduler} from "../../../model/scheduler/impl/Scheduler";
+import {Scheduler} from "../../../model/scheduler/Scheduler";
 import {DiscordUtils, GuildUtils, ObjectUtil, TimeUtils} from "../../../utils/Utils";
 import {Roles} from "../../../enums/Roles";
 import RolesEnum = Roles.RolesEnum;

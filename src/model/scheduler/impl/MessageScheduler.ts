@@ -1,39 +1,57 @@
-import {Scheduler} from "./Scheduler";
 import {IScheduledMessageJob} from "../IScheduledMessageJob";
-import * as schedule from 'node-schedule';
+import {Job} from 'node-schedule';
 import {GuildChannel} from "discord.js";
-import {ScheduledMessageJob} from "../../Impl/ScheduledMessageJob";
+import {ScheduledMessageJob} from "./ScheduledMessageJob";
+import {ScheduledJobModel} from "../../DB/autoMod/impl/ScheduledJob.model";
+import {UniqueViolationError} from "../../../DAO/BaseDAO";
+import {MessageSchedulerModel} from "../../DB/autoMod/impl/MessageScheduler.model";
+import {GenericSchedule} from "./GenericScheduler";
 
-export class MessageScheduler extends Scheduler {
+export class MessageScheduler extends GenericSchedule {
 
     protected _jobs: IScheduledMessageJob[] = [];
-    private channel: GuildChannel = null;
 
-    protected constructor() {
+    protected static instance: MessageScheduler;
+    private readonly channel: GuildChannel = null;
+
+    public constructor(channel: GuildChannel) {
         super();
+        this.channel = channel;
     }
 
-    public static getInstance(): MessageScheduler {
-        return super.getInstance() as MessageScheduler;
-    }
-
-    // @ts-ignore
     public get jobs(): IScheduledMessageJob[] {
         return this._jobs;
     }
 
-    // @ts-ignore
-    protected set jobs(jobs: IScheduledMessageJob[]) {
+    public set jobs(jobs: IScheduledMessageJob[]) {
         this._jobs = jobs;
     }
 
-    public register(name: string, chron: string, callBack: () => void, channel?: GuildChannel): IScheduledMessageJob {
-        this.channel = channel;
-        return super.register(name, chron, callBack) as IScheduledMessageJob;
-    }
+    protected async registerJob(name: string, job: Job, whenToExecute: string | Date, callBack: () => void): Promise<IScheduledMessageJob> {
+        await super.registerJob(name, job, whenToExecute, callBack);
 
-    protected registerJob(name: string, job: schedule.Job): IScheduledMessageJob {
-        return new ScheduledMessageJob(name, job, this.channel);
-    }
+        const model = new MessageSchedulerModel({
+            channel: this.channel,
+            scheduledJobName: name
+        });
+        try {
+            await super.commitToDatabase(model);
+        } catch (e) {
+            if (e instanceof UniqueViolationError) {
+                await ScheduledJobModel.update({
+                    hannel: this.channel,
+                    scheduledJobName: name
+                }, {
+                    where: {
+                        name
+                    }
+                });
+            } else {
+                console.error(e);
+                throw e;
+            }
+        }
 
+        return new ScheduledMessageJob(name, job, this.channel, callBack, whenToExecute);
+    }
 }

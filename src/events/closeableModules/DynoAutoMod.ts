@@ -13,8 +13,9 @@ import {Main} from "../../Main";
 import {DiscordUtils, GuildUtils, ObjectUtil} from "../../utils/Utils";
 import * as Immutable from "immutable";
 import {MessageEventEditTrigger} from "../../model/decorators/MessageEventEditTrigger";
+import {AutoModSettings} from "../../model/closeableModules/settings/automod/AutoModSettings";
 
-export class DynoAutoMod extends CloseableModule<null> {
+export class DynoAutoMod extends CloseableModule<AutoModSettings> {
 
     private _muteTimeoutArray: TimedSet<MuteViolation> = new TimedSet(AbstractFilter.muteViolationTimeout * 1000);
 
@@ -32,7 +33,7 @@ export class DynoAutoMod extends CloseableModule<null> {
             return;
         }
         const filters = this.submodules;
-        const violatedFilters: IDynoAutoModFilter[] = [];
+        const violatedFilters: IDynoAutoModFilter<any>[] = [];
         if (!message.member) {
             return;
         }
@@ -138,8 +139,8 @@ export class DynoAutoMod extends CloseableModule<null> {
         return arr.find(value => value.userId === userId && value._guildId === guildid);
     }
 
-    public get submodules(): Immutable.Set<IDynoAutoModFilter> {
-        return super.submodules as Immutable.Set<IDynoAutoModFilter>;
+    public get submodules(): Immutable.Set<IDynoAutoModFilter<any>> {
+        return super.submodules as Immutable.Set<IDynoAutoModFilter<any>>;
     }
 
 }

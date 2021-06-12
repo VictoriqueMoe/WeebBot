@@ -6,7 +6,7 @@ import {DEFAULT_SETTINGS, SETTINGS} from "../../enums/SETTINGS";
 import {AbstractCommand} from "../AbstractCommand";
 import {secureCommand} from "../../guards/RoleConstraint";
 import {ICloseableModule} from "../../model/closeableModules/ICloseableModule";
-import {AutoRoleSettings} from "../../model/closeableModules/AutoRoleSettings";
+import {AutoRoleSettings} from "../../model/closeableModules/settings/AutoRoleSettings";
 import {AutoRole} from "../../events/closeableModules/autoRole/AutoRole";
 
 

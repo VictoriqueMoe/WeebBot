@@ -9,7 +9,7 @@ import {DiscordUtils, GuildUtils, ObjectUtil, TimeUtils} from "../../../utils/Ut
 import {GuildManager} from "../../../model/guild/manager/GuildManager";
 import {UniqueViolationError} from "../../../DAO/BaseDAO";
 import {BannedWordFilter} from "../../../model/closeableModules/subModules/dynoAutoMod/impl/BannedWordFilter";
-import {AutoRoleSettings} from "../../../model/closeableModules/AutoRoleSettings";
+import {AutoRoleSettings} from "../../../model/closeableModules/settings/AutoRoleSettings";
 import TIME_UNIT = TimeUtils.TIME_UNIT;
 
 class RoleProxy extends AbstractRoleApplier {
@@ -29,7 +29,7 @@ export class AutoRole extends CloseableModule<AutoRoleSettings> {
     private static _uid = ObjectUtil.guid();
 
     constructor() {
-        super(CloseOptionModel, AutoRole._uid);
+        super(CloseOptionModel, AutoRole._uid, "AutoRole");
     }
 
     @On("guildMemberAdd")
@@ -62,7 +62,18 @@ export class AutoRole extends CloseableModule<AutoRoleSettings> {
         const toAddRole = now + oneMin;
         const d = new Date(toAddRole);
         schedule.scheduleJob(`enable ${member.user.tag}`, d, async () => {
+            // load member in case they have left the guild before the timeout
+            try {
+                member = await member.fetch(true);
+            } catch {
+                return;
+            }
+
             if (member.deleted) {
+                return;
+            }
+            if (member.roles.cache.size > 0) {
+                // this user already has roles, don't bother applying anything
                 return;
             }
             const module = DiscordUtils.getModule("DynoAutoMod");
@@ -129,11 +140,6 @@ export class AutoRole extends CloseableModule<AutoRoleSettings> {
                 }
             }
         }
-    }
-
-
-    public get moduleId(): string {
-        return "AutoRole";
     }
 
     public get isDynoReplacement(): boolean {

@@ -16,7 +16,7 @@ export class AuditLogger extends CloseableModule<null> {
     private static _uid = ObjectUtil.guid();
 
     constructor() {
-        super(CloseOptionModel, AuditLogger._uid);
+        super(CloseOptionModel, AuditLogger._uid, "userLog");
     }
 
     @On("guildMemberAdd")
@@ -95,11 +95,6 @@ export class AuditLogger extends CloseableModule<null> {
             }
             return DiscordUtils.postToLog(content, guildId);
         });
-    }
-
-
-    public get moduleId(): string {
-        return "userLog";
     }
 
     public get isDynoReplacement(): boolean {

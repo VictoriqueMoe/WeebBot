@@ -5,9 +5,10 @@ import {InjectDynoSubModule} from "../../../../decorators/InjectDynoSubModule";
 import {PRIORITY} from "../../../../../enums/PRIORITY";
 import {DynoAutoMod} from "../../../../../events/closeableModules/DynoAutoMod";
 import {ObjectUtil} from "../../../../../utils/Utils";
+import {AllCapsFilterSettings} from "../../../settings/automod/filters/AllCapsFilterSettings";
 
 @InjectDynoSubModule(DynoAutoMod)
-export class AllCapsFilter extends AbstractFilter {
+export class AllCapsFilter extends AbstractFilter<AllCapsFilterSettings> {
 
     public get actions(): ACTION[] {
         return [];

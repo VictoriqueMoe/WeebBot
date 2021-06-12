@@ -4,16 +4,18 @@ import {SubModuleManager} from "../../manager/SubModuleManager";
 import {ACTION} from "../../../../enums/ACTION";
 import {ICloseableModule} from "../../ICloseableModule";
 import {DiscordUtils} from "../../../../utils/Utils";
+import {AutoModSettings} from "../../settings/automod/AutoModSettings";
+import {BaseAutoModFilterSettings} from "../../settings/automod/filters/BaseAutoModFilterSettings";
 
-export abstract class AbstractFilter implements IDynoAutoModFilter {
+export abstract class AbstractFilter<T extends BaseAutoModFilterSettings> implements IDynoAutoModFilter<T> {
 
-    protected constructor(protected _parentModule: ICloseableModule<null>) {
+    protected constructor(protected _parentModule: ICloseableModule<AutoModSettings>) {
         if (_parentModule != null) {
             SubModuleManager.instance.addSubModules(this);
         }
     }
 
-    public get parentModule(): ICloseableModule<null> {
+    public get parentModule(): ICloseableModule<AutoModSettings> {
         return this._parentModule;
     }
 

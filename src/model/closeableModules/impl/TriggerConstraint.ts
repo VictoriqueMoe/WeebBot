@@ -3,7 +3,7 @@ import {ITriggerConstraint} from "../ITriggerConstraint";
 import {IEventSecurityConstraint} from "../../DB/IEventSecurityConstraint";
 import {GuildChannel, Message} from "discord.js";
 import {ArrayUtils} from "../../../utils/Utils";
-import {ModuleSettings} from "../ModuleSettings";
+import {ModuleSettings} from "../settings/ModuleSettings";
 
 export abstract class TriggerConstraint<T extends ModuleSettings> extends CloseableModule<T> implements ITriggerConstraint {
 
@@ -41,8 +41,6 @@ export abstract class TriggerConstraint<T extends ModuleSettings> extends Closea
         }
         return true;
     }
-
-    public abstract get moduleId(): string;
 
     public abstract get isDynoReplacement(): boolean;
 

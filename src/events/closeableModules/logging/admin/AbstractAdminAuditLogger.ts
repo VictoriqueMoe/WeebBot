@@ -6,15 +6,11 @@ import {DiscordUtils, GuildUtils} from "../../../../utils/Utils";
 export abstract class AbstractAdminAuditLogger extends CloseableModule<null> {
 
     protected constructor(uid: string) {
-        super(CloseOptionModel, uid);
+        super(CloseOptionModel, uid, "AdminLog");
     }
 
     public get isDynoReplacement(): boolean {
         return true;
-    }
-
-    public get moduleId(): string {
-        return "AdminLog";
     }
 
     protected postToLog(content: MessageEmbed | string, guildId: string, trigger?: GuildMember): Promise<Message> {

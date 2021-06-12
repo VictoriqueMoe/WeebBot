@@ -3,8 +3,9 @@ import {DIService} from "@typeit/discord";
 import {ISubModule} from "../closeableModules/subModules/ISubModule";
 import {ICloseableModule} from "../closeableModules/ICloseableModule";
 import {CloseableModule} from "../closeableModules/impl/CloseableModule";
+import {AutoModSettings} from "../closeableModules/settings/automod/AutoModSettings";
 
-export function InjectDynoSubModule(parentModule: typeof CloseableModule) {
+export function InjectDynoSubModule<T extends CloseableModule<AutoModSettings>>(parentModule: new() => T) {
     // @ts-ignore
     return (constructor: typeof ISubModule) => {
         const parentFilter: ICloseableModule<never> = DIService.instance.getService(parentModule);

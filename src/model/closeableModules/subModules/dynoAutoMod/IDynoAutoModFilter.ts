@@ -1,11 +1,13 @@
 import {Message} from "discord.js";
 import {ISubModule} from "../ISubModule";
 import {ACTION} from "../../../../enums/ACTION";
+import {AutoModSettings} from "../../settings/automod/AutoModSettings";
+import {BaseAutoModFilterSettings} from "../../settings/automod/filters/BaseAutoModFilterSettings";
 
 /**
  * all values hard coded for now, but will be persisted in the future
  */
-export interface IDynoAutoModFilter extends ISubModule {
+export interface IDynoAutoModFilter<T extends BaseAutoModFilterSettings> extends ISubModule<AutoModSettings> {
     /**
      * Get the actions that are done when this filter is violated
      */

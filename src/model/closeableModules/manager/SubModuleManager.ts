@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import {ICloseableModule} from "../ICloseableModule";
 import {ISubModule} from "../subModules/ISubModule";
-import {ModuleSettings} from "../ModuleSettings";
+import {ModuleSettings} from "../settings/ModuleSettings";
 
 export class SubModuleManager {
 

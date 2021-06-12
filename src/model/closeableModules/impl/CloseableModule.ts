@@ -1,74 +1,35 @@
-import {BaseDAO} from "../../../DAO/BaseDAO";
 import {ICloseOption} from "../../DB/autoMod/ICloseOption";
 import {Main} from "../../../Main";
 import {ICloseableModule} from "../ICloseableModule";
 import {ISubModule} from "../subModules/ISubModule";
 import * as Immutable from "immutable";
 import {SubModuleManager} from "../manager/SubModuleManager";
-import {ModuleSettings} from "../ModuleSettings";
+import {ModuleSettings} from "../settings/ModuleSettings";
 import {GuildUtils, ObjectUtil} from "../../../utils/Utils";
 import {Channel, GuildMember, TextChannel} from "discord.js";
 import {Roles} from "../../../enums/Roles";
 import {CloseOptionModel} from "../../DB/autoMod/impl/CloseOption.model";
+import {ModuleSettingsManager} from "../manager/ModuleSettingsManager";
 import RolesEnum = Roles.RolesEnum;
 
-export abstract class CloseableModule<T extends ModuleSettings> extends BaseDAO<ICloseOption> implements ICloseableModule<T> {
+export abstract class CloseableModule<T extends ModuleSettings> extends ModuleSettingsManager<T> implements ICloseableModule<T> {
 
     private _isEnabled: Map<string, boolean | null>;
 
-    private _settings: Map<string, T | null>;
-
-    // @ts-ignore
-    protected constructor(private _model: typeof ICloseOption, private _uid: string) {
-        super();
+    protected constructor(_model: typeof CloseOptionModel, private _uid: string, _moduleId: string) {
+        super(_model, _moduleId);
         Main.closeableModules.add(this);
-        this._settings = new Map();
+
         this._isEnabled = new Map();
     }
 
-    public async saveSettings(guildId: string, setting: T, merge = false): Promise<void> {
-        let obj = setting;
-        if (merge) {
-            const percistedSettings = await this.getSettings(guildId);
-            obj = {...percistedSettings, ...setting};
-        }
-        await this._model.update(
-            {
-                "settings": obj
-            },
-            {
-                where: {
-                    "moduleId": this.moduleId,
-                    guildId
-                }
-            }
-        );
-        this._settings.set(guildId, obj);
+    public get moduleId(): string {
+        return this._moduleId;
     }
-
-    public async getSettings(guildId: string): Promise<T | null> {
-        if (this._settings.has(guildId)) {
-            return this._settings.get(guildId);
-        }
-        const model: ICloseOption = await this._model.findOne({
-            attributes: ["settings"],
-            where: {
-                "moduleId": this.moduleId,
-                guildId
-            }
-        });
-        if (!model || !ObjectUtil.isValidObject(model.settings)) {
-            return null;
-        }
-        this._settings.set(guildId, model.settings as T);
-        return this._settings.get(guildId);
-    }
-
-    public abstract get moduleId(): string;
 
     public abstract get isDynoReplacement(): boolean;
 
-    public get submodules(): Immutable.Set<ISubModule> {
+    public get submodules(): Immutable.Set<ISubModule<T>> {
         return SubModuleManager.instance.getSubModulesFromParent(this);
     }
 

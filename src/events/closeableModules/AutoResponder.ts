@@ -12,7 +12,7 @@ export class AutoResponder extends TriggerConstraint<null> {
     private static _uid = ObjectUtil.guid();
 
     constructor() {
-        super(CloseOptionModel, AutoResponder._uid);
+        super(CloseOptionModel, AutoResponder._uid, "AutoResponder");
     }
 
     @MessageEventEditTrigger
@@ -93,10 +93,6 @@ export class AutoResponder extends TriggerConstraint<null> {
 
     get isDynoReplacement(): boolean {
         return false;
-    }
-
-    get moduleId(): string {
-        return "AutoResponder";
     }
 
     private async _parseVars(response: string, {channel, guild, member}: Message): Promise<string> {
